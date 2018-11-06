@@ -9,6 +9,27 @@
 import UIKit
 import MapKit
 
+class CastleMapAnnotation: NSObject, MKAnnotation {
+    
+    static let clusteringIdentifier = "CastleMap"
+    
+    let coordinate: CLLocationCoordinate2D
+    
+    let glyphText: String
+    
+    let glyphTintColor: UIColor
+    
+    let markerTintColor: UIColor
+    
+    init(_ coordinate: CLLocationCoordinate2D, glyphText: String, glyphTintColor: UIColor, markerTintColor: UIColor) {
+        self.coordinate = coordinate
+        self.glyphText = glyphText
+        self.glyphTintColor = glyphTintColor
+        self.markerTintColor = markerTintColor
+    }
+    
+}
+
 class ViewController: UIViewController , UITextFieldDelegate{
 
     override func viewDidLoad() {
@@ -17,6 +38,11 @@ class ViewController: UIViewController , UITextFieldDelegate{
         
         // Text Fieldのdelegate通知先を設定
         inputText.delegate = self
+        
+        let osaka = CastleMapAnnotation(CLLocationCoordinate2D(latitude: 34.687333, longitude: 135.525956), glyphText: "大阪城", glyphTintColor: .white, markerTintColor: .red)
+        
+        let annotations = [osaka]
+        dispMap.addAnnotations(annotations)
     }
 
 
@@ -97,6 +123,21 @@ class ViewController: UIViewController , UITextFieldDelegate{
         } else {
             dispMap.mapType = .standard
         }
+    }
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier, for: annotation)
+        
+        guard let markerAnnotationView = annotationView as? MKMarkerAnnotationView,
+            let castleMapAnnotation = annotation as? CastleMapAnnotation else { return annotationView }
+        
+        markerAnnotationView.clusteringIdentifier = CastleMapAnnotation.clusteringIdentifier
+        markerAnnotationView.glyphText = castleMapAnnotation.glyphText
+        markerAnnotationView.glyphTintColor = castleMapAnnotation.glyphTintColor
+        markerAnnotationView.markerTintColor = castleMapAnnotation.markerTintColor
+        
+        return markerAnnotationView
     }
 }
 
